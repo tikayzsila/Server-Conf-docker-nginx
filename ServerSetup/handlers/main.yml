@@ -1,0 +1,13 @@
+---
+# handlers file for ServerSetup
+  - name: Restart nginx
+    service:
+      name: nginx
+      state: restarted
+
+  - name: Enable services
+    ansible.builtin.service:
+      name: "{{item}}"
+      enabled: yes
+      state: restarted
+    with_items: "{{services}}"

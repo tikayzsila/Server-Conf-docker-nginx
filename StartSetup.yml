@@ -1,0 +1,6 @@
+- name: Server Packages Setup
+  hosts: server
+  become: yes
+  gather_facts: yes
+  roles:
+      - ServerSetup

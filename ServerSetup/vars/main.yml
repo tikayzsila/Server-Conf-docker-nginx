@@ -1,0 +1,27 @@
+---
+# vars file for ServerSetup
+      project_name: WebTest
+      PASSWD: test
+
+      services:
+        - docker
+        - containerd
+        - nginx
+
+      docker_users:
+        - support
+        - ansible
+
+      packages:
+        - apt-transport-https
+        - ca-certificates
+        - curl
+        - net-tools
+        - tree
+        - gnupg
+        - software-properties-common
+
+      DockerNginxPkgs:
+        - nginx
+        - docker-ce
+        - docker-compose

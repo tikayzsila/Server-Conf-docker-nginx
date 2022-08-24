@@ -1,0 +1,83 @@
+---
+# tasks file for ServerSetup
+
+  - name: "Install & update packages to last version"
+    apt:
+      pkg: "{{packages}}"
+      state: present
+
+  - name: Add docker repo
+    ansible.builtin.copy:
+      src: ./files/docker.list
+      dest: /etc/apt/sources.list.d/
+      owner: root
+      group: root
+      mode: '0644'
+
+  - name: Install & update packages to last version
+    apt:
+      pkg: "{{DockerNginxPkgs}}"
+      state: present
+
+  - name: Create group
+    group:
+      name: ansible
+      state: present
+
+  - name: Create ansible user(for deploy operations)
+    user:
+      name: ansible
+      state: present
+      password: "{{ PASSWD | password_hash('sha512','A512') }}"
+      shell: /bin/bash
+      generate_ssh_key: true
+      group: ansible
+
+  - name: Add users to docker group and enable services
+    user:
+      name: "{{item}}"
+      groups: docker
+      append: yes
+    with_items: "{{docker_users}}"
+    notify: Enable services
+
+  - name: Create Project Folder
+    file:
+      path: /var/www/{{project_name}}
+      state: directory
+      recurse: yes
+      owner: www-data
+      group: www-data
+      mode: 0755
+
+  - name: Delete Default Conf
+    file:
+      path: "/etc/nginx/sites-aveliable/default"
+      state: absent
+
+  - name: Delete Default Symlink
+    file:
+      path: "/etc/nginx/sites-enabled/default"
+      state: absent
+
+  - name: Delete Default Project Folder
+    ansible.builtin.file:
+      path: /var/www/html
+      state: absent
+
+  - name: Change Default Config
+    template:
+      src: default.j2
+      dest: "/etc/nginx/sites-available/{{project_name}}"
+      owner: root
+      group: root
+      mode: 0644
+    notify: Restart nginx
+
+  - name: Add symlink in sites-enabled.
+    file:
+      src: "/etc/nginx/sites-available/{{project_name}}"
+      dest: "/etc/nginx/sites-enabled/{{project_name}}"
+      state: link
+    notify: Restart nginx
+
