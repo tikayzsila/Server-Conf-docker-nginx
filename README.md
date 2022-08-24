@@ -1,38 +1,31 @@
-Role Name
+Установка Docker и nginx на чистый сервер (Ubuntu 22.04)
 =========
 
-A brief description of the role goes here.
-
-Requirements
+Роль для настройки веб-сервера
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+Устанавливает docker, docker-compose и nginx(вместе с конфигурацией)
 
-Role Variables
+Требования
+------------
+
+Хост с версией ubuntu 22.04 (если версия другая то отредактировать файл ServerSetup/file/docker.list)
+
+Переменные
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+*group_vars*: ansible_host, ansible_user, ansible_password, ansible_sudo_pass
+*vars(main.yml)*: В этом файле описаны все пакеты для установки, также пароль для ansible пользователя и имя проекта(исп. в конфигурации nginx)
 
-Dependencies
-------------
+        
+*   Проверить соединение можно командой:
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+        sudo ansible ИМЯ_ХОСТА -i hosts -m ping -b
 
-Example Playbook
+Пример использования роли
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+*   Для использования роли достаточно запустить команду:
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+        sudo ansible-playbook -i hosts StartSetup.yml
 
-License
--------
-
-BSD
-
-Author Information
-------------------
-
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
