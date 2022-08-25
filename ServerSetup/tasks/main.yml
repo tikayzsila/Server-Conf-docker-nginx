@@ -6,16 +6,19 @@
       pkg: "{{packages}}"
       state: present
 
-  - name: Add docker repo
-    ansible.builtin.copy:
-      src: ./files/docker.list
-      dest: /etc/apt/sources.list.d/
-      owner: root
-      group: root
-      mode: '0644'
+  - name: add Docker gpg key
+    ansible.builtin.get_url:
+      url: https://download.docker.com/linux/ubuntu/gpg
+      dest: /etc/apt/trusted.gpg.d/docker.asc
+
+  - name: add Docker repo
+    ansible.builtin.apt_repository:
+      repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+      state: present
 
   - name: Install & update packages to last version
     apt:
+      update_cache: true
       pkg: "{{DockerNginxPkgs}}"
       state: present
 
@@ -49,35 +52,4 @@
       owner: www-data
       group: www-data
       mode: 0755
-
-  - name: Delete Default Conf
-    file:
-      path: "/etc/nginx/sites-aveliable/default"
-      state: absent
-
-  - name: Delete Default Symlink
-    file:
-      path: "/etc/nginx/sites-enabled/default"
-      state: absent
-
-  - name: Delete Default Project Folder
-    ansible.builtin.file:
-      path: /var/www/html
-      state: absent
-
-  - name: Change Default Config
-    template:
-      src: default.j2
-      dest: "/etc/nginx/sites-available/{{project_name}}"
-      owner: root
-      group: root
-      mode: 0644
-    notify: Restart nginx
-
-  - name: Add symlink in sites-enabled.
-    file:
-      src: "/etc/nginx/sites-available/{{project_name}}"
-      dest: "/etc/nginx/sites-enabled/{{project_name}}"
-      state: link
-    notify: Restart nginx
 
